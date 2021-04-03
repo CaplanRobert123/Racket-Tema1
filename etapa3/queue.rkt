@@ -93,7 +93,10 @@
 ; Veți întoarce elementul aflat la începutul cozii.
 (define (top q)
   (if (= (queue-size-l q) 0)
-      (car (reverse (queue-right q)))
+      (if (= (queue-size-r q) 0)
+          '()
+          (car (reverse (queue-right q)))
+          )
       (car (queue-left q))
       )
   )
