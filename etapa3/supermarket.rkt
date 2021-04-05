@@ -175,32 +175,7 @@
          ]
 
         [x
-         (if (null? (filter (lambda (C) (> (counter-et C) 0)) fast-counters))
-             (if (null? (filter (lambda (C) (> (counter-et C) 0)) slow-counters))
-                 (serve-helper (cdr requests) outs (pass-time-through-all-counters x fast-counters) (pass-time-through-all-counters x slow-counters))
-                 (if (and (>= x (cdr (min-et (filter (lambda (C) (> (counter-et C) 0)) slow-counters)))) (clients? slow-counters))
-                     (serve-helper (cdr requests) (append (create-out-pair x slow-counters) outs) fast-counters (minute-by-minute-list x slow-counters))
-                     (serve-helper (cdr requests) outs (pass-time-through-all-counters x fast-counters) (pass-time-through-all-counters x slow-counters))
-                     )
-                 )
-             (if (null? (filter (lambda (C) (> (counter-et C) 0)) slow-counters))
-                 (if (and (>= x (cdr (min-et (filter (lambda (C) (> (counter-et C) 0)) fast-counters)))) (clients? fast-counters))
-                     (serve-helper (cdr requests) (append (create-out-pair x fast-counters) outs) (minute-by-minute-list x fast-counters) slow-counters)
-                     (serve-helper (cdr requests) outs (pass-time-through-all-counters x fast-counters) (pass-time-through-all-counters x slow-counters))
-                     )
-                 (if (and (>= x (cdr (min-et (filter (lambda (C) (> (counter-et C) 0)) slow-counters)))) (clients? slow-counters))
-                     (if (clients? fast-counters)
-                         (serve-helper (cdr requests) (append (create-out-pair x (append fast-counters slow-counters)) outs) (pass-time-through-all-counters x fast-counters) (minute-by-minute-list x slow-counters))
-                         (serve-helper (cdr requests) (append (create-out-pair x slow-counters) outs) (pass-time-through-all-counters x fast-counters) (pass-time-through-all-counters x slow-counters))
-                         )
-                     (if (and (>= x (cdr (min-et (filter (lambda (C) (> (counter-et C) 0)) fast-counters)))) (clients? fast-counters))
-                         (serve-helper (cdr requests) (append (create-out-pair x (append fast-counters slow-counters)) outs) (minute-by-minute-list x fast-counters) (pass-time-through-all-counters x slow-counters))
-                         (serve-helper requests (append (create-out-pair x slow-counters) outs) fast-counters (minute-by-minute-list x slow-counters))
-                         )
-
-                     )
-                 )
-             )
+         (serve-helper (cdr requests) (append (create-out-pair x (append slow-counters fast-counters)) outs) (minute-by-minute-list x fast-counters) (minute-by-minute-list x slow-counters))
          ]
         )
       )
@@ -210,55 +185,32 @@
   (filter (lambda (C) (not (queue-empty? (counter-queue C)))) counters)
   )
 
-(define (pass-time-through-all-counters minutes counters)
-  (map (pass-time-through-counter-serve minutes) counters)
-  )
-
-(define (remove-first-from-list counters)
-  (map remove-first-from-counter counters)
-  )
-
 (define (create-out-pair x counters)
   (map cons (map counter-index (filter (lambda (C) (<= (counter-et C) x)) (non-empty-counters counters))) (map car (map top (map counter-queue (filter (lambda (C) (<= (counter-et C) x)) (non-empty-counters counters))))))
   )
 
-(define (clients? counters)
-  (not (null? (filter (lambda (C) (not (queue-empty? (counter-queue C)))) counters)))
-  )
-
-(define (pass-time-through-counter-serve minutes)
-  (λ (C)
-    (if (queue-empty? (counter-queue C))
-        (if (> (counter-tt C) 0)
-            (struct-copy counter C [tt (- (counter-tt C) minutes)] [et (- (counter-et C) minutes)])
-            (struct-copy counter C [tt 0] [et 0])
-            )
-        (struct-copy counter C [tt (- (counter-tt C) minutes)] [et (- (counter-et C) minutes)]))
-    )
-  )
-
-
 (define (minute-by-minute x)
   (lambda (C)
-    (if (>= x 0)
+    (if (= x 0)
         (if (= (counter-et C) 0)
             (if (not (queue-empty? (counter-queue C)))
-                ((minute-by-minute (sub1 x)) (remove-first-from-counter C))
+                (remove-first-from-counter C)
+                C
+                )
+            C
+            )
+        (if (= (counter-et C) 0)
+            (if (not (queue-empty? (counter-queue C)))
+                ((minute-by-minute x) (remove-first-from-counter C))
                 C
                 )
             ((minute-by-minute (sub1 x)) (struct-copy counter C [tt (sub1 (counter-tt C))] [et (sub1 (counter-et C))]))
             )
-        C
         )
+    
     )
   )
 
 (define (minute-by-minute-list x counters)
   (map (minute-by-minute x) counters)
   )
-
-(define C1 (empty-counter 1))
-(define C2 (empty-counter 2))
-(define C3 (empty-counter 3))
-(define C4 (empty-counter 4))
-(define C5 (make-counter 5 12 8 (queue '((remus . 6) (vivi . 4)) '() 2 0)))
