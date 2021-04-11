@@ -6,8 +6,6 @@
 
 (define ITEMS 5)
 
-(define-struct counter (index tt et queue) #:transparent)
-
 
 ; TODO
 ; Aveți libertatea să vă structurați programul cum doriți (dar cu restricțiile
@@ -18,7 +16,7 @@
 ; - cozile de la case trebuie implementate folosind noul TDA queue
 
 (define (empty-counter index)
-  (make-counter index 0 0 empty-queue))
+  'your-code-here)
   
   
 ; TODO

@@ -70,42 +70,27 @@
 ; TODO
 ; Definiți valoarea care reprezintă o structură queue goală.
 (define empty-queue
-  (make-queue empty-stream '() 0 0))
+  'your-code-here)
 
 
 ; TODO
 ; Implementați o funcție care verifică dacă o coadă este goală.
 (define (queue-empty? q)
-  (if (stream-empty? (queue-left q))
-      (if(= 0 (length (queue-right q)))
-         #t
-         #f)
-      #f
-      ))
+  'your-code-here)
+
 
 ; TODO
 ; Implementați funcția rotate, conform axiomelor de mai sus.
 ; Atenție: ce tip trebuie să aibă Acc?
 (define (rotate left right Acc)
-  (if (stream-empty? left)
-      (stream-cons (car right) Acc)
-      (stream-cons (stream-first left) (rotate (stream-rest left) (cdr right) (stream-cons (car right) Acc)))
-      )
-  )
+  'your-code-here)
 
 ; TODO
 ; Implementați o funcție care adaugă un element la sfârșitul unei cozi.
 ; Veți întoarce coada actualizată.
 ; Atenție: în urma adăugării unui element, poate fi necesară o rotație!
 (define (enqueue x q)
-  (if (= (queue-size-r q) (queue-size-l q))
-      (if (= (queue-size-r q) 0)
-          (struct-copy queue q [left (list x)] [size-l 1])
-          (struct-copy queue q [left (rotate (queue-left q) (cons x (queue-right q)) '())] [right null] [size-l (+ (queue-size-r q) (queue-size-l q) 1)] [size-r 0])
-          )
-      (struct-copy queue q [right (reverse (append (reverse (queue-right q)) (list x)))] [size-r (+ (queue-size-r q) 1)])
-      )
-  )
+  'your-code-here)
 
 
 ; TODO
@@ -114,31 +99,12 @@
 ; Veți întoarce coada actualizată.
 ; Atenție: în urma înlăturării unui element, poate fi necesară o rotație!
 (define (dequeue q)
-  (if (= (queue-size-r q) 0)
-      (if (= (queue-size-l q) 0)
-          q
-          (struct-copy queue q [left (stream-rest (queue-left q))] [size-l (sub1 (queue-size-l q))])
-          )
-      (if (= (queue-size-l q) 0)
-          q
-          (if (= (queue-size-r q) (queue-size-l q))
-              (struct-copy queue q [left (rotate (stream-rest (queue-left q)) (queue-right q) '())] [right null] [size-l (- (+ (queue-size-r q) (queue-size-l q)) 1)] [size-r 0])
-              (struct-copy queue q [left (stream-rest (queue-left q))] [size-l (sub1 (queue-size-l q))])
-              )
-          )
-      )
-  )
+  'your-code-here)
+
 
 ; TODO
 ; Implementați o funcție care obține primul element dintr-o coadă nevidă
 ; (nu verificați că e nevidă, pe coada vidă este firesc să dea eroare).
 ; Veți întoarce elementul aflat la începutul cozii.
 (define (top q)
-  (if (= (queue-size-l q) 0)
-      (if (= (queue-size-r q) 0)
-          '()
-          (car (reverse (queue-right q)))
-          )
-      (stream-first (queue-left q))
-      )
-  )
+  'your-code-here)
